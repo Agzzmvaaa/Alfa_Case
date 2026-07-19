@@ -1,0 +1,10 @@
+{
+  "name": "alfa-start-prototype",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Прототип «Альфа.Старт» — AI-компаньон первого года бизнеса",
+  "scripts": {
+    "start": "python3 -m http.server 8080",
+    "serve": "npx --yes serve . -p 8080"
+  }
+}

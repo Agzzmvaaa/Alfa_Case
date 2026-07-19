@@ -1,0 +1,990 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#EF3124" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="description" content="Альфа.Старт — AI-компаньон первого года бизнеса. Прототип для кейса Альфа-Банк / Changellenge 2026." />
+  <meta property="og:title" content="Альфа.Старт — прототип" />
+  <meta property="og:description" content="Банк первого оборота для предпринимателей 17–25: AI, платежи, программа 90/180." />
+  <meta property="og:image" content="assets/preview.png" />
+  <meta property="og:type" content="website" />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%23EF3124'/%3E%3Ctext x='16' y='22' text-anchor='middle' fill='white' font-size='16' font-family='system-ui' font-weight='700'%3Eα%3C/text%3E%3C/svg%3E" />
+  <title>Альфа.Старт — прототип</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --alfa-red: #EF3124;
+      --alfa-red-dark: #D91F14;
+      --alfa-red-soft: #FFE8E6;
+      --ink: #0B1F35;
+      --ink-60: #6D7986;
+      --ink-30: #B5BBC2;
+      --platinum: #D1D5D8;
+      --bg: #F3F4F5;
+      --white: #FFFFFF;
+      --green: #0D9336;
+      --green-soft: #E6F6EC;
+      --amber: #F6A704;
+      --amber-soft: #FFF6E0;
+      --radius: 16px;
+      --radius-sm: 12px;
+      --shadow: 0 8px 28px rgba(11, 31, 53, 0.08);
+      --safe-b: env(safe-area-inset-bottom, 0px);
+      --nav-h: 64px;
+      --font: "Manrope", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { height: 100%; }
+    body {
+      font-family: var(--font);
+      background: #1a1a1a;
+      color: var(--ink);
+      -webkit-font-smoothing: antialiased;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    /* Desktop: phone frame */
+    .stage {
+      min-height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px 16px;
+      background:
+        radial-gradient(ellipse 80% 50% at 80% 100%, rgba(239, 49, 36, 0.35), transparent 55%),
+        linear-gradient(160deg, #111 0%, #2a2a2a 100%);
+    }
+
+    .phone {
+      width: min(390px, 100%);
+      height: min(844px, calc(100vh - 48px));
+      background: var(--bg);
+      border-radius: 36px;
+      overflow: hidden;
+      position: relative;
+      box-shadow:
+        0 0 0 10px #111,
+        0 0 0 12px #333,
+        0 40px 80px rgba(0,0,0,.45);
+      display: flex;
+      flex-direction: column;
+    }
+
+    @media (max-width: 480px) {
+      .stage {
+        padding: 0;
+        background: var(--bg);
+        align-items: stretch;
+      }
+      .phone {
+        width: 100%;
+        height: 100dvh;
+        border-radius: 0;
+        box-shadow: none;
+      }
+      .desktop-hint { display: none !important; }
+    }
+
+    .desktop-hint {
+      position: absolute;
+      left: 24px;
+      bottom: 24px;
+      color: rgba(255,255,255,.55);
+      font-size: 12px;
+      max-width: 200px;
+      line-height: 1.4;
+    }
+
+    /* Status bar */
+    .status {
+      height: 44px;
+      padding: 12px 24px 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 13px;
+      font-weight: 700;
+      background: var(--white);
+      flex-shrink: 0;
+    }
+    .status-icons { display: flex; gap: 6px; opacity: .75; font-size: 11px; }
+
+    /* Screens */
+    .screens {
+      flex: 1;
+      overflow: hidden;
+      position: relative;
+    }
+    .screen {
+      position: absolute;
+      inset: 0;
+      overflow-y: auto;
+      overflow-x: hidden;
+      padding: 0 16px calc(var(--nav-h) + var(--safe-b) + 16px);
+      opacity: 0;
+      pointer-events: none;
+      transform: translateY(8px);
+      transition: opacity .28s ease, transform .28s ease;
+      -webkit-overflow-scrolling: touch;
+    }
+    .screen.active {
+      opacity: 1;
+      pointer-events: auto;
+      transform: translateY(0);
+    }
+
+    /* Header */
+    .app-header {
+      background: var(--white);
+      margin: 0 -16px 16px;
+      padding: 8px 16px 16px;
+    }
+    .brand-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 14px;
+    }
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 800;
+      font-size: 17px;
+      letter-spacing: -0.02em;
+    }
+    .logo-mark {
+      width: 28px;
+      height: 28px;
+      background: var(--alfa-red);
+      border-radius: 8px;
+      display: grid;
+      place-items: center;
+      color: #fff;
+      font-size: 14px;
+      font-weight: 800;
+    }
+    .badge-pill {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--alfa-red);
+      background: var(--alfa-red-soft);
+      padding: 6px 10px;
+      border-radius: 999px;
+    }
+
+    h1 {
+      font-size: 26px;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      line-height: 1.15;
+      margin-bottom: 6px;
+    }
+    .sub {
+      color: var(--ink-60);
+      font-size: 14px;
+      line-height: 1.4;
+      font-weight: 500;
+    }
+
+    /* Cards */
+    .card {
+      background: var(--white);
+      border-radius: var(--radius);
+      padding: 16px;
+      margin-bottom: 12px;
+      box-shadow: var(--shadow);
+    }
+    .card-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--ink-60);
+      margin-bottom: 8px;
+      text-transform: uppercase;
+      letter-spacing: .04em;
+    }
+
+    .hero-card {
+      background: linear-gradient(135deg, #EF3124 0%, #FF5A4A 55%, #FF8A70 100%);
+      color: #fff;
+      border-radius: 20px;
+      padding: 20px;
+      margin-bottom: 12px;
+      position: relative;
+      overflow: hidden;
+    }
+    .hero-card::after {
+      content: "";
+      position: absolute;
+      right: -20px;
+      top: -30px;
+      width: 140px;
+      height: 140px;
+      border-radius: 50%;
+      background: rgba(255,255,255,.12);
+    }
+    .hero-label { font-size: 12px; font-weight: 700; opacity: .85; margin-bottom: 8px; }
+    .hero-amount { font-size: 34px; font-weight: 800; letter-spacing: -0.03em; margin-bottom: 4px; }
+    .hero-meta { font-size: 13px; opacity: .9; font-weight: 500; }
+    .hero-row {
+      display: flex;
+      gap: 8px;
+      margin-top: 16px;
+      position: relative;
+      z-index: 1;
+    }
+    .hero-chip {
+      background: rgba(255,255,255,.18);
+      backdrop-filter: blur(8px);
+      border-radius: 999px;
+      padding: 8px 12px;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+    .tile {
+      background: var(--white);
+      border-radius: var(--radius-sm);
+      padding: 14px;
+      box-shadow: var(--shadow);
+      border: none;
+      text-align: left;
+      cursor: pointer;
+      font-family: inherit;
+      color: inherit;
+      transition: transform .15s ease, box-shadow .15s ease;
+    }
+    .tile:active { transform: scale(.97); }
+    .tile-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      display: grid;
+      place-items: center;
+      font-size: 18px;
+      margin-bottom: 10px;
+      background: var(--alfa-red-soft);
+    }
+    .tile-title { font-size: 14px; font-weight: 700; margin-bottom: 2px; }
+    .tile-sub { font-size: 11px; color: var(--ink-60); font-weight: 500; }
+
+    .health {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+    .ring {
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
+      background: conic-gradient(var(--green) 0 78%, var(--platinum) 78% 100%);
+      display: grid;
+      place-items: center;
+      flex-shrink: 0;
+    }
+    .ring-inner {
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      background: var(--white);
+      display: grid;
+      place-items: center;
+      font-weight: 800;
+      font-size: 15px;
+    }
+    .health-text strong { display: block; font-size: 15px; margin-bottom: 4px; }
+    .health-text span { font-size: 12px; color: var(--ink-60); line-height: 1.35; font-weight: 500; }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      width: 100%;
+      border: none;
+      border-radius: 14px;
+      padding: 14px 16px;
+      font-family: inherit;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background .15s ease, transform .15s ease;
+    }
+    .btn:active { transform: scale(.98); }
+    .btn-primary { background: var(--alfa-red); color: #fff; }
+    .btn-primary:hover { background: var(--alfa-red-dark); }
+    .btn-ghost {
+      background: var(--white);
+      color: var(--ink);
+      border: 1px solid var(--platinum);
+    }
+    .btn-row { display: flex; gap: 8px; margin-top: 12px; }
+    .btn-row .btn { flex: 1; }
+
+    /* Journey */
+    .steps { display: flex; flex-direction: column; gap: 0; }
+    .step {
+      display: grid;
+      grid-template-columns: 28px 1fr;
+      gap: 12px;
+      padding: 12px 0;
+    }
+    .step-dot {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      font-size: 12px;
+      font-weight: 800;
+      color: #fff;
+      background: var(--alfa-red);
+      position: relative;
+    }
+    .step:not(:last-child) .step-dot::after {
+      content: "";
+      position: absolute;
+      top: 28px;
+      left: 50%;
+      width: 2px;
+      height: calc(100% + 8px);
+      background: var(--platinum);
+      transform: translateX(-50%);
+    }
+    .step.done .step-dot { background: var(--green); }
+    .step.soon .step-dot { background: var(--ink-30); }
+    .step h3 { font-size: 14px; font-weight: 700; margin-bottom: 2px; }
+    .step p { font-size: 12px; color: var(--ink-60); font-weight: 500; line-height: 1.35; }
+
+    /* Chat */
+    .chat-wrap {
+      display: flex;
+      flex-direction: column;
+      min-height: calc(100% - 8px);
+    }
+    .messages {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      padding-bottom: 12px;
+    }
+    .msg {
+      max-width: 88%;
+      padding: 12px 14px;
+      border-radius: 16px;
+      font-size: 14px;
+      line-height: 1.4;
+      font-weight: 500;
+      animation: pop .25s ease;
+    }
+    @keyframes pop {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: none; }
+    }
+    .msg-ai {
+      align-self: flex-start;
+      background: var(--white);
+      box-shadow: var(--shadow);
+      border-bottom-left-radius: 4px;
+    }
+    .msg-user {
+      align-self: flex-end;
+      background: var(--alfa-red);
+      color: #fff;
+      border-bottom-right-radius: 4px;
+    }
+    .msg-ai .ai-label {
+      font-size: 11px;
+      font-weight: 800;
+      color: var(--alfa-red);
+      margin-bottom: 4px;
+    }
+    .disclaimer {
+      font-size: 11px;
+      color: var(--ink-60);
+      margin-top: 8px;
+      padding-top: 8px;
+      border-top: 1px solid var(--bg);
+      line-height: 1.35;
+    }
+    .quick {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-bottom: 10px;
+    }
+    .chip {
+      border: 1px solid var(--platinum);
+      background: var(--white);
+      border-radius: 999px;
+      padding: 8px 12px;
+      font-size: 12px;
+      font-weight: 600;
+      font-family: inherit;
+      cursor: pointer;
+      color: var(--ink);
+    }
+    .chip:active { background: var(--alfa-red-soft); border-color: var(--alfa-red); color: var(--alfa-red); }
+    .composer {
+      display: flex;
+      gap: 8px;
+      background: var(--white);
+      border-radius: 16px;
+      padding: 8px;
+      box-shadow: var(--shadow);
+      position: sticky;
+      bottom: 0;
+    }
+    .composer input {
+      flex: 1;
+      border: none;
+      outline: none;
+      font-family: inherit;
+      font-size: 14px;
+      font-weight: 500;
+      padding: 8px 10px;
+      background: transparent;
+      color: var(--ink);
+    }
+    .composer button {
+      width: 40px;
+      height: 40px;
+      border: none;
+      border-radius: 12px;
+      background: var(--alfa-red);
+      color: #fff;
+      font-size: 18px;
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+
+    /* Pay */
+    .qr-box {
+      background: var(--white);
+      border-radius: 20px;
+      padding: 24px;
+      text-align: center;
+      box-shadow: var(--shadow);
+      margin-bottom: 12px;
+    }
+    .qr {
+      width: 180px;
+      height: 180px;
+      margin: 0 auto 14px;
+      border-radius: 12px;
+      background:
+        linear-gradient(#0B1F35 0 0) 0 0 / 20% 20%,
+        linear-gradient(#0B1F35 0 0) 100% 0 / 20% 20%,
+        linear-gradient(#0B1F35 0 0) 0 100% / 20% 20%,
+        linear-gradient(#0B1F35 0 0) 100% 100% / 20% 20%,
+        repeating-conic-gradient(#0B1F35 0% 25%, #fff 0% 50%) 50% / 12px 12px;
+      background-repeat: no-repeat;
+      position: relative;
+    }
+    .qr::after {
+      content: "α";
+      position: absolute;
+      inset: 50%;
+      transform: translate(-50%, -50%);
+      width: 36px;
+      height: 36px;
+      background: var(--alfa-red);
+      color: #fff;
+      border-radius: 8px;
+      display: grid;
+      place-items: center;
+      font-weight: 800;
+      font-size: 18px;
+    }
+    .link-box {
+      background: var(--bg);
+      border-radius: 12px;
+      padding: 12px;
+      font-size: 12px;
+      font-weight: 600;
+      word-break: break-all;
+      color: var(--ink-60);
+      margin-top: 8px;
+    }
+    .niche-tabs {
+      display: flex;
+      gap: 6px;
+      margin-bottom: 12px;
+      overflow-x: auto;
+      padding-bottom: 2px;
+    }
+    .niche-tab {
+      flex-shrink: 0;
+      border: none;
+      background: var(--white);
+      border-radius: 999px;
+      padding: 8px 14px;
+      font-family: inherit;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--ink-60);
+      cursor: pointer;
+      box-shadow: var(--shadow);
+    }
+    .niche-tab.active {
+      background: var(--alfa-red);
+      color: #fff;
+    }
+
+    .tag {
+      display: inline-block;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 4px 8px;
+      border-radius: 6px;
+      background: var(--green-soft);
+      color: var(--green);
+      margin-bottom: 8px;
+    }
+    .tag.warn { background: var(--amber-soft); color: #B57A00; }
+
+    /* Bottom nav */
+    .nav {
+      position: absolute;
+      left: 0; right: 0; bottom: 0;
+      height: calc(var(--nav-h) + var(--safe-b));
+      padding-bottom: var(--safe-b);
+      background: rgba(255,255,255,.92);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-top: 1px solid rgba(209, 213, 216, .7);
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      z-index: 20;
+    }
+    .nav button {
+      border: none;
+      background: none;
+      font-family: inherit;
+      font-size: 10px;
+      font-weight: 700;
+      color: var(--ink-30);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 3px;
+      cursor: pointer;
+      padding-top: 8px;
+    }
+    .nav button .ico { font-size: 20px; line-height: 1; }
+    .nav button.active { color: var(--alfa-red); }
+
+    .toast {
+      position: absolute;
+      left: 16px; right: 16px;
+      bottom: calc(var(--nav-h) + var(--safe-b) + 12px);
+      background: var(--ink);
+      color: #fff;
+      padding: 12px 16px;
+      border-radius: 14px;
+      font-size: 13px;
+      font-weight: 600;
+      z-index: 30;
+      transform: translateY(120%);
+      opacity: 0;
+      transition: .3s ease;
+      pointer-events: none;
+    }
+    .toast.show { transform: translateY(0); opacity: 1; }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="stage">
+    <p class="desktop-hint">Прототип «Альфа.Старт»<br />Откройте на телефоне или сузьте окно — интерфейс адаптируется.</p>
+
+    <div class="phone" id="app" role="application" aria-label="Альфа.Старт">
+      <div class="status">
+        <span id="clock">9:41</span>
+        <span class="status-icons">▌▌▌ &nbsp;▮▮ &nbsp;🔋</span>
+      </div>
+
+      <div class="screens">
+        <!-- HOME -->
+        <section class="screen active" id="screen-home" aria-label="Главная">
+          <div class="app-header">
+            <div class="brand-row">
+              <div class="logo">
+                <div class="logo-mark">α</div>
+                Альфа.Старт
+              </div>
+              <span class="badge-pill">Пилот · 17–25</span>
+            </div>
+            <h1>Привет, Камила</h1>
+            <p class="sub">Банк первого оборота — от идеи до устойчивых платежей</p>
+          </div>
+
+          <div class="hero-card">
+            <div class="hero-label">Оборот за 30 дней</div>
+            <div class="hero-amount">48 650 ₽</div>
+            <div class="hero-meta">Комиссии: 412 ₽ · 14 входящих платежей</div>
+            <div class="hero-row">
+              <span class="hero-chip">РКО 0 ₽ · ещё 4 мес.</span>
+              <span class="hero-chip">Edtech</span>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-title">Здоровье оборота</div>
+            <div class="health">
+              <div class="ring"><div class="ring-inner">78</div></div>
+              <div class="health-text">
+                <strong>Бизнес живой</strong>
+                <span>До цели 90 дней осталось 41 день. Есть регулярные платежи — так держать.</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="grid-2">
+            <button class="tile" type="button" data-go="pay">
+              <div class="tile-icon">💳</div>
+              <div class="tile-title">Принять оплату</div>
+              <div class="tile-sub">QR или ссылка</div>
+            </button>
+            <button class="tile" type="button" data-go="ai">
+              <div class="tile-icon">✦</div>
+              <div class="tile-title">AI-компаньон</div>
+              <div class="tile-sub">Спросить совет</div>
+            </button>
+            <button class="tile" type="button" data-go="journey">
+              <div class="tile-icon">🗺</div>
+              <div class="tile-title">Путь 90/180</div>
+              <div class="tile-sub">Чек-лист старта</div>
+            </button>
+            <button class="tile" type="button" onclick="toast('Плейбук «Репетитор» открыт')">
+              <div class="tile-icon">📘</div>
+              <div class="tile-title">Плейбук ниши</div>
+              <div class="tile-sub">Образование</div>
+            </button>
+          </div>
+
+          <div class="card">
+            <div class="card-title">Задачи на эту неделю</div>
+            <div class="steps">
+              <div class="step done">
+                <div class="step-dot">✓</div>
+                <div>
+                  <h3>Открыть счёт</h3>
+                  <p>РКО Youth Start · пакет «Первый оборот»</p>
+                </div>
+              </div>
+              <div class="step done">
+                <div class="step-dot">✓</div>
+                <div>
+                  <h3>Первая оплата</h3>
+                  <p>Ссылка на урок · 2 500 ₽</p>
+                </div>
+              </div>
+              <div class="step">
+                <div class="step-dot">3</div>
+                <div>
+                  <h3>10 клиентов за месяц</h3>
+                  <p>Осталось 3 · скрипт в AI-компаньоне</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- AI -->
+        <section class="screen" id="screen-ai" aria-label="AI-компаньон">
+          <div class="app-header">
+            <div class="brand-row">
+              <div class="logo">
+                <div class="logo-mark">✦</div>
+                AI-компаньон
+              </div>
+              <span class="badge-pill">Whitelist</span>
+            </div>
+            <h1>Чем помочь?</h1>
+            <p class="sub">Подсказки по старту и платежам. Не юридическая и не налоговая консультация.</p>
+          </div>
+
+          <div class="chat-wrap">
+            <div class="messages" id="messages">
+              <div class="msg msg-ai">
+                <div class="ai-label">Альфа.Старт AI</div>
+                Привет! Я помогу с первой оплатой, кэшфлоу и чек-листами старта. Выбери тему или напиши вопрос.
+                <div class="disclaimer">Информация справочная. По налогам и праву — к специалисту.</div>
+              </div>
+            </div>
+            <div class="quick" id="quick">
+              <button class="chip" type="button" data-q="Как принять первую оплату?">Первая оплата</button>
+              <button class="chip" type="button" data-q="Какой способ оплаты выбрать репетитору?">Способ оплаты</button>
+              <button class="chip" type="button" data-q="Почему банк может запросить документы?">115-ФЗ</button>
+              <button class="chip" type="button" data-q="Сколько у меня комиссии за месяц?">Мои комиссии</button>
+            </div>
+            <form class="composer" id="composer">
+              <input type="text" id="chatInput" placeholder="Напиши вопрос…" autocomplete="off" aria-label="Сообщение" />
+              <button type="submit" aria-label="Отправить">↑</button>
+            </form>
+          </div>
+        </section>
+
+        <!-- PAY -->
+        <section class="screen" id="screen-pay" aria-label="Приём оплаты">
+          <div class="app-header">
+            <div class="brand-row">
+              <div class="logo">
+                <div class="logo-mark">₽</div>
+                Первый оборот
+              </div>
+              <span class="badge-pill">Льгота 90 дней</span>
+            </div>
+            <h1>Принять оплату</h1>
+            <p class="sub">QR или ссылка за 1 клик — шаблоны под твою нишу</p>
+          </div>
+
+          <div class="niche-tabs" role="tablist">
+            <button class="niche-tab active" type="button" data-niche="ed">Образование</button>
+            <button class="niche-tab" type="button" data-niche="ecom">E-com</button>
+            <button class="niche-tab" type="button" data-niche="beauty">Бьюти</button>
+          </div>
+
+          <div class="qr-box">
+            <span class="tag" id="nicheTag">Шаблон: урок / пакет занятий</span>
+            <div class="qr" aria-hidden="true"></div>
+            <strong style="font-size:18px">2 500 ₽</strong>
+            <p class="sub" style="margin-top:4px" id="nicheDesc">Предоплата за 4 занятия</p>
+            <div class="link-box" id="payLink">pay.alfabank.ru/start/k.agzamova/lesson-4</div>
+            <div class="btn-row">
+              <button class="btn btn-ghost" type="button" onclick="toast('Ссылка скопирована')">Копировать</button>
+              <button class="btn btn-primary" type="button" onclick="toast('Поделились в Telegram')">Поделиться</button>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-title">Сравнение способов</div>
+            <p class="sub" style="margin-bottom:10px">AI объясняет на примере суммы 2 500 ₽</p>
+            <div style="display:flex;flex-direction:column;gap:8px;font-size:13px;font-weight:600">
+              <div style="display:flex;justify-content:space-between;padding:10px;background:var(--bg);border-radius:10px">
+                <span>Ссылка / СБП</span><span style="color:var(--green)">~18 ₽</span>
+              </div>
+              <div style="display:flex;justify-content:space-between;padding:10px;background:var(--bg);border-radius:10px">
+                <span>QR на месте</span><span style="color:var(--green)">~18 ₽</span>
+              </div>
+              <div style="display:flex;justify-content:space-between;padding:10px;background:var(--bg);border-radius:10px">
+                <span>Эквайринг карта</span><span style="color:var(--ink-60)">~50–60 ₽</span>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- JOURNEY -->
+        <section class="screen" id="screen-journey" aria-label="Путь 90/180">
+          <div class="app-header">
+            <div class="brand-row">
+              <div class="logo">
+                <div class="logo-mark">90</div>
+                Выживаемость
+              </div>
+              <span class="badge-pill">День 49</span>
+            </div>
+            <h1>Программа 90/180</h1>
+            <p class="sub">Банк помогает дожить до устойчивых платежей — не только открыть счёт</p>
+          </div>
+
+          <div class="card">
+            <span class="tag warn">Следующий чекпоинт · День 60</span>
+            <strong style="display:block;margin-bottom:6px">Цель: 8+ входящих платежей / мес.</strong>
+            <p class="sub">Сейчас 14 — отлично. AI пришлёт алерт, если оборот просядет 14 дней подряд.</p>
+          </div>
+
+          <div class="card">
+            <div class="card-title">Твой путь</div>
+            <div class="steps">
+              <div class="step done">
+                <div class="step-dot">✓</div>
+                <div>
+                  <h3>День 0–7 · Первая оплата</h3>
+                  <p>Счёт + QR/ссылка + шаблон сообщения клиенту</p>
+                </div>
+              </div>
+              <div class="step done">
+                <div class="step-dot">✓</div>
+                <div>
+                  <h3>День 30 · Привычка</h3>
+                  <p>Еженедельный digest оборота и комиссий</p>
+                </div>
+              </div>
+              <div class="step">
+                <div class="step-dot">90</div>
+                <div>
+                  <h3>День 90 · Устойчивость</h3>
+                  <p>Health score ≥ 70 · community + плейбук роста</p>
+                </div>
+              </div>
+              <div class="step soon">
+                <div class="step-dot">180</div>
+                <div>
+                  <h3>День 180 · Рост</h3>
+                  <p>Эквайринг, выплаты самозанятым, апселл</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <button class="btn btn-primary" type="button" data-go="ai">Спросить AI про рост клиентов</button>
+        </section>
+      </div>
+
+      <nav class="nav" aria-label="Навигация">
+        <button type="button" class="active" data-nav="home"><span class="ico">⌂</span>Главная</button>
+        <button type="button" data-nav="ai"><span class="ico">✦</span>AI</button>
+        <button type="button" data-nav="pay"><span class="ico">₽</span>Оплата</button>
+        <button type="button" data-nav="journey"><span class="ico">◎</span>Путь</button>
+      </nav>
+
+      <div class="toast" id="toast" role="status"></div>
+    </div>
+  </div>
+
+  <script>
+    const screens = {
+      home: document.getElementById("screen-home"),
+      ai: document.getElementById("screen-ai"),
+      pay: document.getElementById("screen-pay"),
+      journey: document.getElementById("screen-journey"),
+    };
+    const navBtns = document.querySelectorAll(".nav button");
+
+    function go(name) {
+      Object.entries(screens).forEach(([key, el]) => {
+        el.classList.toggle("active", key === name);
+      });
+      navBtns.forEach((b) => b.classList.toggle("active", b.dataset.nav === name));
+      screens[name].scrollTop = 0;
+    }
+
+    navBtns.forEach((b) => b.addEventListener("click", () => go(b.dataset.nav)));
+    document.querySelectorAll("[data-go]").forEach((el) => {
+      el.addEventListener("click", () => go(el.dataset.go));
+    });
+
+    function toast(text) {
+      const t = document.getElementById("toast");
+      t.textContent = text;
+      t.classList.add("show");
+      clearTimeout(toast._timer);
+      toast._timer = setTimeout(() => t.classList.remove("show"), 2200);
+    }
+
+    // Clock
+    function tick() {
+      const d = new Date();
+      document.getElementById("clock").textContent =
+        d.getHours().toString().padStart(2, "0") + ":" +
+        d.getMinutes().toString().padStart(2, "0");
+    }
+    tick();
+    setInterval(tick, 30000);
+
+    // Niches
+    const niches = {
+      ed: {
+        tag: "Шаблон: урок / пакет занятий",
+        desc: "Предоплата за 4 занятия",
+        link: "pay.alfabank.ru/start/k.agzamova/lesson-4",
+      },
+      ecom: {
+        tag: "Шаблон: заказ в соцсетях",
+        desc: "Оплата заказа · доставка отдельно",
+        link: "pay.alfabank.ru/start/k.agzamova/order-128",
+      },
+      beauty: {
+        tag: "Шаблон: запись + предоплата",
+        desc: "Бронь слота · 1 500 ₽",
+        link: "pay.alfabank.ru/start/k.agzamova/booking-15",
+      },
+    };
+    document.querySelectorAll(".niche-tab").forEach((tab) => {
+      tab.addEventListener("click", () => {
+        document.querySelectorAll(".niche-tab").forEach((t) => t.classList.remove("active"));
+        tab.classList.add("active");
+        const n = niches[tab.dataset.niche];
+        document.getElementById("nicheTag").textContent = n.tag;
+        document.getElementById("nicheDesc").textContent = n.desc;
+        document.getElementById("payLink").textContent = n.link;
+      });
+    });
+
+    // AI chat
+    const replies = {
+      "Как принять первую оплату?":
+        "За 3 шага: 1) открой «Оплата» → выбери шаблон ниши; 2) создай ссылку или QR; 3) отправь клиенту в Telegram. Цель пилота — первая оплата ≤ 2 дней. Если застрянешь — нажми «Поделиться» прямо из экрана.",
+      "Какой способ оплаты выбрать репетитору?":
+        "Для репетитора чаще всего хватает платёжной ссылки / СБП: клиент платит с телефона, комиссия ниже эквайринга. QR удобен, если занимаетесь офлайн. Эквайринг картой — когда нужен сайт или много разовых клиентов.",
+      "Почему банк может запросить документы?":
+        "Это стандартная проверка по 115-ФЗ: банк уточняет происхождение средств или контрагента. Обычно помогает заранее сохранять договоры/оферты и не смешивать личные и бизнес-платежи. Статус запроса будет в приложении — прозрачно, без «молчаливой» блокировки.",
+      "Сколько у меня комиссии за месяц?":
+        "За последние 30 дней комиссии ≈ 412 ₽ при обороте 48 650 ₽. В «Здоровье оборота» на главной видно разбивку. Могу подсказать, как снизить долю комиссий сменой способа оплаты.",
+    };
+
+    const defaultReply =
+      "Записал вопрос. В пилоте AI отвечает по whitelist-сценариям: первая оплата, комиссии, кэшфлоу, чек-листы старта и базовые пояснения по 115-ФЗ. Уточни тему одной из кнопок ниже — так ответ будет точнее.";
+
+    function addMsg(text, who) {
+      const box = document.getElementById("messages");
+      const div = document.createElement("div");
+      div.className = "msg " + (who === "user" ? "msg-user" : "msg-ai");
+      if (who === "ai") {
+        div.innerHTML =
+          '<div class="ai-label">Альфа.Старт AI</div>' +
+          text +
+          '<div class="disclaimer">Информация справочная. Не является юр./налоговой консультацией.</div>';
+      } else {
+        div.textContent = text;
+      }
+      box.appendChild(div);
+      box.scrollTop = box.scrollHeight;
+      screens.ai.scrollTop = screens.ai.scrollHeight;
+    }
+
+    function ask(q) {
+      if (!q.trim()) return;
+      addMsg(q, "user");
+      setTimeout(() => {
+        addMsg(replies[q] || defaultReply, "ai");
+      }, 450);
+    }
+
+    document.getElementById("quick").addEventListener("click", (e) => {
+      const btn = e.target.closest("[data-q]");
+      if (!btn) return;
+      ask(btn.dataset.q);
+    });
+
+    document.getElementById("composer").addEventListener("submit", (e) => {
+      e.preventDefault();
+      const input = document.getElementById("chatInput");
+      const q = input.value;
+      input.value = "";
+      ask(q);
+    });
+  </script>
+</body>
+</html>
